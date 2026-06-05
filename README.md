@@ -1,0 +1,3 @@
+### This repository contains an Ansible role that configures a host machine to run automated backups via a systemd timer and service. The timer triggers a bash script that archives configured directories safely from docker compose scheme and transfers them to an S3 bucket using rclone. The S3 bucket is provisioned separately using the included Terraform configuration.
+
+### Authentication is handled via an AWS instance profile, so the EC2 instance role must have `s3:PutObject`, `s3:GetObject`, and `s3:ListBucket` permissions on the target bucket.
