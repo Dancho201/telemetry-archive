@@ -1,0 +1,46 @@
+---
+- name: Check if rclone is installed
+  ansible.builtin.command: which rclone
+  register: rclone_check
+  changed_when: false
+  failed_when: false
+
+- name: Download rclone installer
+  ansible.builtin.get_url:
+    url: https://rclone.org/install.sh
+    dest: /tmp/rclone-install.sh
+    mode: "0755"
+  when: rclone_check.rc != 0
+
+- name: Install rclone
+  ansible.builtin.command: bash /tmp/rclone-install.sh
+  when: rclone_check.rc != 0
+
+- name: Create rclone config directory
+  ansible.builtin.file:
+    path: "{{ rclone_config_dir }}"
+    state: directory
+    owner: "{{ backup_user }}"
+    group: "{{ backup_user }}"
+    mode: "0750"
+
+- name: Copy rclone config to shared location
+  ansible.builtin.copy:
+    src: rclone.conf
+    dest: "{{ rclone_config_dir }}/rclone.conf"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_user }}"
+    mode: "0600"
+
+- name: Verify rclone can reach remote
+  ansible.builtin.command: 
+    cmd: "sudo -u {{ backup_user }} rclone --config /etc/rclone/rclone.conf lsd {{ rclone_remote }}:"
+  environment:
+    RCLONE_CONFIG: "{{ rclone_config_dir }}/rclone.conf"
+  register: rclone_verify
+  changed_when: false
+  failed_when: false
+
+- name: Show rclone verification result
+  ansible.builtin.debug:
+    var: rclone_verify.stdout_lines

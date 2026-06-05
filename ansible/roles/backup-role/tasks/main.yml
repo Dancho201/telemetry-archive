@@ -1,0 +1,12 @@
+---
+- name: Pre-configure system (user, dirs, script)
+  ansible.builtin.import_tasks: preconfigure.yml
+  tags: [preconfigure]
+
+- name: Configure rclone
+  ansible.builtin.import_tasks: rclone.yml
+  tags: [rclone]
+
+- name: Configure systemd service and timer
+  ansible.builtin.import_tasks: systemd.yml
+  tags: [systemd]

@@ -1,0 +1,7 @@
+---
+- name: Configure automated S3 backup
+  hosts: backup-servers
+  become: true
+
+  roles:
+    - backup-role

@@ -1,0 +1,14 @@
+backup_user: backup-agent
+backup_script_src: ts-backup.sh.j2   # relative to templates/
+backup_script_dest: /opt/ts-backup.sh
+backup_staging_dir: /var/backup/staging
+backup_log_dir: /var/log/backup
+rclone_config_dir: /etc/rclone
+rclone_remote: "s3-deep-archive"
+
+ts_backup_description: "TS Backup Service"
+ts_backup_script: "/opt/ts-backup.sh"
+ts_backup_user: "root"
+ts_backup_schedule: "weekly"
+ts_backup_persistent: "true"
+ts_backup_random_delay: "1h"

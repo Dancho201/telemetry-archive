@@ -1,0 +1,11 @@
+[Unit]
+Description=Run {{ ts_backup_description | default('TS Backup') }} timer
+Requires=ts-backup.service
+
+[Timer]
+OnCalendar={{ ts_backup_schedule | default('weekly') }}
+Persistent={{ ts_backup_persistent | default('true') }}
+RandomizedDelaySec={{ ts_backup_random_delay | default('1h') }}
+
+[Install]
+WantedBy=timers.target

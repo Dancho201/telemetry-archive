@@ -1,0 +1,10 @@
+[Unit]
+Description={{ ts_backup_description | default('TS Backup Service') }}
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart={{ ts_backup_script | default('/opt/ts-backup.sh') }}
+User={{ ts_backup_user | default('root') }}
+StandardOutput=journal
+StandardError=journal

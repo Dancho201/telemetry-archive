@@ -1,0 +1,31 @@
+---
+- name: Create ts-backup systemd service
+  template:
+    src: ts-backup.service.j2
+    dest: /etc/systemd/system/ts-backup.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Create ts-backup systemd timer
+  template:
+    src: ts-backup.timer.j2
+    dest: /etc/systemd/system/ts-backup.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Enable and start ts-backup timer
+  systemd:
+    name: ts-backup.timer
+    enabled: true
+    state: started
+
+- name: Ensure ts-backup.sh is executable
+  file:
+    path: "{{ ts_backup_script | default('/opt/ts-backup.sh') }}"
+    mode: '0755'
+    owner: root
+    group: root

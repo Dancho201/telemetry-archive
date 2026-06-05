@@ -1,0 +1,5 @@
+inventory
+backup.pem
+.terraform*
+terraform.tfvars
+terraform.tf*
