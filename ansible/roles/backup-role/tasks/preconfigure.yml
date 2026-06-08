@@ -18,19 +18,23 @@
   loop:
     - "{{ backup_staging_dir }}"
     - "{{ backup_log_dir }}"
+    - "{{ backup_dir }}"
 
-- name: Copy backup script
+- name: Copy backup script and config
   ansible.builtin.copy:
-    src: ts-backup.sh    
-    dest: "{{ backup_script_dest }}"
-    owner: root
-    group: root
-    mode: "0755"
+     src: "{{ item }}"
+     dest: "{{ backup_dir }}"
+     owner: root
+     group: root
+     mode: "0755"
+  loop:
+    - backup.conf
+    - ts-backup.sh
 
 - name: Ensure RCLONE_CONFIG export is in backup script
   ansible.builtin.lineinfile:
-    path: "{{ backup_script_dest }}"
+    path: "{{ backup_script_dest }}/ts-backup.sh"
     insertafter: "^# ─── Configuration"
-    line: "export RCLONE_CONFIG={{ rclone_config_dir }}/rclone.conf"
     regexp: "^export RCLONE_CONFIG="
+    line: "export RCLONE_CONFIG={{ rclone_config_dir }}/rclone.conf"
 
