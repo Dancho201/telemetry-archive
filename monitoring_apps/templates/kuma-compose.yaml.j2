@@ -1,0 +1,10 @@
+services:
+  uptime-kuma:
+    image: {{ kuma_image }}
+    container_name: uptime-kuma
+    restart: unless-stopped
+    user: "{{ noto_uid }}:{{ noto_gid }}"
+    ports:
+      - "{{ apps_bind_address }}:{{ kuma_port }}:3001"
+    volumes:
+      - ./data:/app/data

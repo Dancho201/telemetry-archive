@@ -1,0 +1,8 @@
+---
+- name: Configure swap (instance has very little RAM)
+  ansible.builtin.import_tasks: swap.yml
+  tags: [swap]
+
+- name: Install Docker Engine
+  ansible.builtin.import_tasks: docker.yml
+  tags: [docker]

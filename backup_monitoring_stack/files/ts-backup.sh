@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# backup.sh — Automated backup to AWS S3 Glacier Deep Archive
+# backup.sh — Automated backup to AWS S3 Glacier Instant Retrieval
 # =============================================================================
 set -euo pipefail
 
@@ -28,7 +28,7 @@ DOCKER_STOP_TIMEOUT="${DOCKER_STOP_TIMEOUT:-30}"
 STAGING_DIR="${STAGING_DIR:-/var/backup/staging}"
 LOG_DIR="${LOG_DIR:-/var/log/backup}"
 LOG_FILE="${LOG_DIR}/backup-$(date +%Y-%m).log"
-MAX_LOG_DAYS="${MAX_LOG_DAYS:-90}"
+MAX_LOG_DAYS="${MAX_LOG_DAYS:-30}"
 KEEP_LOCAL_ARCHIVES="${KEEP_LOCAL_ARCHIVES:-7}"
 RCLONE_RETRIES="${RCLONE_RETRIES:-3}"
 
@@ -106,11 +106,20 @@ check_disk_space() {
 
 STOPPED_COMPOSE_DIRS=()
 
+# Print the compose file used in a directory; non-zero if there is none
+compose_file() {
+    local f
+    for f in compose.yaml compose.yml docker-compose.yaml docker-compose.yml; do
+        [[ -f "$1/$f" ]] && { echo "$1/$f"; return 0; }
+    done
+    return 1
+}
+
 _docker_restart_all() {
     if [[ ${#STOPPED_COMPOSE_DIRS[@]} -gt 0 ]]; then
         log_warn "EXIT trap: restarting any stopped containers..."
         for compose_dir in "${STOPPED_COMPOSE_DIRS[@]}"; do
-            docker compose -f "${compose_dir}/compose.yml" start >/dev/null 2>&1 || true
+            docker compose -f "$(compose_file "$compose_dir")" start >/dev/null 2>&1 || true
         done
     fi
 }
@@ -120,12 +129,11 @@ trap '_docker_restart_all' EXIT
 
 docker_stop() {
     local compose_dir="$1"
-    if [[ ! -f "${compose_dir}/compose.yml" && ! -f "${compose_dir}/docker-compose.yml" ]]; then
-        return 0
-    fi
+    local file
+    file="$(compose_file "$compose_dir")" || return 0
 
     log_info "Stopping containers in: ${compose_dir}"
-    if docker compose -f "${compose_dir}/compose.yml" stop --timeout "$DOCKER_STOP_TIMEOUT" >> "$LOG_FILE" 2>&1; then
+    if docker compose -f "$file" stop --timeout "$DOCKER_STOP_TIMEOUT" >> "$LOG_FILE" 2>&1; then
         STOPPED_COMPOSE_DIRS+=("$compose_dir")
         log_success "Containers stopped."
         sleep 2
@@ -137,12 +145,11 @@ docker_stop() {
 
 docker_start() {
     local compose_dir="$1"
-    if [[ ! -f "${compose_dir}/compose.yml" && ! -f "${compose_dir}/docker-compose.yml" ]]; then
-        return 0
-    fi
+    local file
+    file="$(compose_file "$compose_dir")" || return 0
 
     log_info "Starting containers in: ${compose_dir}"
-    if docker compose -f "${compose_dir}/compose.yml" start >> "$LOG_FILE" 2>&1; then
+    if docker compose -f "$file" start >> "$LOG_FILE" 2>&1; then
         # Remove from trap list
         local updated=()
         for d in "${STOPPED_COMPOSE_DIRS[@]}"; do

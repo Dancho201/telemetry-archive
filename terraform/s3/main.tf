@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "tsdb_backup" {
 
   tags = merge(var.tags, {
     Name    = var.bucket_name
-    Purpose = "tsdb-deep-archive-backup"
+    Purpose = "tsdb-glacier-ir-backup"
   })
 }
 
@@ -22,7 +22,7 @@ resource "aws_s3_bucket_versioning" "tsdb_backup" {
   bucket = aws_s3_bucket.tsdb_backup.id
 
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled" 
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tsdb_backup" {
   }
 }
 
-# Lifecycle policy: move to Deep Archive + expire old versions
+# Lifecycle policy: move to Glacier Instant Retrieval + expire old versions
 resource "aws_s3_bucket_lifecycle_configuration" "tsdb_backup" {
   bucket = aws_s3_bucket.tsdb_backup.id
 
@@ -55,9 +55,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "tsdb_backup" {
     }
   }
 
-  # Transition current objects to Deep Archive and eventually expire them
+  # Transition current objects to Glacier Instant Retrieval and eventually expire them
   rule {
-    id     = "backups-deep-archive-lifecycle"
+    id     = "backups-glacier-ir-lifecycle"
     status = "Enabled"
 
     filter {
@@ -66,7 +66,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "tsdb_backup" {
 
     transition {
       days          = 0
-      storage_class = "DEEP_ARCHIVE"
+      storage_class = "GLACIER_IR"
     }
 
     expiration {

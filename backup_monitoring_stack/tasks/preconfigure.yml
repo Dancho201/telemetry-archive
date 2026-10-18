@@ -1,19 +1,26 @@
 ---
-- name: Create backup-agent system user
+- name: Check if noto user exists
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ noto_user }}"
+    fail_key: false
+
+- name: Create noto system user
   ansible.builtin.user:
-    name: "{{ backup_user }}"
+    name: "{{ noto_user }}"
     system: true
     shell: /usr/sbin/nologin
     create_home: false
     groups: docker
     append: true
+  when: getent_passwd[noto_user] is none
 
 - name: Create required directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ backup_user }}"
-    group: "{{ backup_user }}"
+    owner: "{{ noto_user }}"
+    group: "{{ noto_user }}"
     mode: "0750"
   loop:
     - "{{ backup_staging_dir }}"
@@ -24,8 +31,8 @@
   ansible.builtin.copy:
      src: "{{ item }}"
      dest: "{{ backup_dir }}"
-     owner: root
-     group: root
+     owner: "{{ noto_user }}"
+     group: "{{ noto_user }}"
      mode: "0755"
   loop:
     - backup.conf

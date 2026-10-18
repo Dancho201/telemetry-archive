@@ -3,8 +3,8 @@
   template:
     src: ts-backup.service.j2
     dest: /etc/systemd/system/ts-backup.service
-    owner: root
-    group: root
+    owner: "{{ noto_user }}"
+    group: "{{ noto_user }}"
     mode: '0644'
   notify: Reload systemd
 
@@ -12,15 +12,15 @@
   file:
     path: "{{ ts_backup_script | default('/opt/ts-backup.sh') }}"
     mode: '0755'
-    owner: root
-    group: root
+    owner: "{{ noto_user }}"
+    group: "{{ noto_user }}"
 
 - name: Create ts-backup systemd timer
   template:
     src: ts-backup.timer.j2
     dest: /etc/systemd/system/ts-backup.timer
-    owner: root
-    group: root
+    owner: "{{ noto_user }}"
+    group: "{{ noto_user }}"
     mode: '0644'
   notify: Reload systemd
 

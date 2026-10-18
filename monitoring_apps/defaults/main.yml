@@ -1,0 +1,10 @@
+noto_user: noto
+apps_bind_address: 127.0.0.1 # Only reachable through an SSH tunnel
+
+kuma_dir: /opt/kumacompose
+kuma_image: louislam/uptime-kuma:2.5.6-slim
+kuma_port: 3001
+
+grafana_dir: /opt/grafanacompose
+grafana_image: grafana/grafana:13.2.4
+grafana_port: 3000

@@ -1,0 +1,10 @@
+services:
+  grafana:
+    image: {{ grafana_image }}
+    container_name: grafana
+    restart: unless-stopped
+    user: "{{ noto_uid }}:{{ noto_gid }}"
+    ports:
+      - "{{ apps_bind_address }}:{{ grafana_port }}:3000"
+    volumes:
+      - ./data:/var/lib/grafana

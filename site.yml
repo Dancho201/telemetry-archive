@@ -1,0 +1,9 @@
+---
+- name: Deploy backup monitoring stack
+  hosts: mon_backup
+  become: true
+
+  roles:
+    - docker_engine
+    - backup_monitoring_stack
+    - monitoring_apps

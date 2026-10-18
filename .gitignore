@@ -1,5 +1,133 @@
-inventory
-backup.pem
-.terraform*
-terraform.tfvars
-terraform.tf*
+# =============================================================================
+# Terraform
+# =============================================================================
+# Local provider/module cache (.terraform.lock.hcl is intentionally committed)
+**/.terraform/*
+
+# State files (contain resource details and can include secrets)
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# Variable files (often contain credentials)
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Saved plan files (can contain sensitive values)
+*.tfplan
+*.plan
+tfplan
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config (may contain API tokens)
+.terraformrc
+terraform.rc
+
+# =============================================================================
+# Ansible
+# =============================================================================
+# Real inventory exposes host IPs; commit inventory.ini.example instead
+inventory.ini
+!inventory.ini.example
+host_vars/
+group_vars/**/vault*
+!group_vars/**/vault*.example
+
+# Vault password files (encrypted vault files themselves are safe to commit)
+.vault_pass*
+.vault-pass*
+vault_pass*
+vault-pass*
+*.vault_pass
+*.vault-password
+
+# Retry files, local caches and logs
+*.retry
+.ansible/
+ansible.log
+fact_cache/
+
+# =============================================================================
+# SSH keys & certificates
+# =============================================================================
+*.pem
+*.pem.pub
+*.key
+*.ppk
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+known_hosts
+
+# =============================================================================
+# Credentials & env files
+# =============================================================================
+.env
+.env.*
+!.env.example
+.envrc
+.direnv/
+.aws/
+credentials
+*.credentials
+*.secret
+*.secrets
+secrets/
+
+# =============================================================================
+# Backup data (archives contain app databases and settings)
+# =============================================================================
+*.tar
+*.tar.gz
+*.tgz
+*.tar.zst
+*.sha256
+*.db
+*.sqlite
+*.sqlite3
+restore/
+backups/
+staging/
+
+# =============================================================================
+# Logs & temp files
+# =============================================================================
+*.log
+*.tmp
+*.bak
+*.orig
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# =============================================================================
+# Editor / OS
+# =============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Screenshot*.png

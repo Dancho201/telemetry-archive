@@ -37,5 +37,5 @@ variable "tags" {
 variable "aws_region" {
   description = "AWS region to deploy the bucket in"
   type        = string
-  default     = "eu-central-1"
+  default     = "eu-west-1"
 }

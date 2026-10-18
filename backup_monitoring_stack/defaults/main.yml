@@ -1,0 +1,14 @@
+noto_user: noto
+backup_script_src: ts-backup.sh.j2
+backup_script_dest: /opt/tsdb-backup
+backup_dir: /opt/tsdb-backup
+backup_staging_dir: /var/ts-backup/staging
+backup_log_dir: /var/log/ts-backup
+rclone_config_dir: /etc/rclone
+rclone_remote: "s3-deep-archive"
+rclone_s3_bucket: "tsdb-backup-da" # Name of the s3 bucket
+
+ts_backup_description: "TS Backup Service"
+ts_backup_script: "/opt/tsdb-backup/ts-backup.sh"
+ts_backup_user: "noto"
+ts_backup_schedule: "monthly"

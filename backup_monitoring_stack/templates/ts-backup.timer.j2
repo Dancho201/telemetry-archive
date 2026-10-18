@@ -1,0 +1,10 @@
+[Unit]
+Description=Run {{ ts_backup_description }} timer
+
+[Timer]
+OnCalendar={{ ts_backup_schedule | default('monthly') }}
+Persistent=true
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target

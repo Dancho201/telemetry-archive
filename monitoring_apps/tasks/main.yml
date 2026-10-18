@@ -1,0 +1,43 @@
+---
+- name: Look up noto user
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ noto_user }}"
+
+# Containers run as noto so the backup service (User=noto) can read their data
+- name: Record noto uid and gid
+  ansible.builtin.set_fact:
+    noto_uid: "{{ getent_passwd[noto_user][1] }}"
+    noto_gid: "{{ getent_passwd[noto_user][2] }}"
+
+- name: Create compose and data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ noto_user }}"
+    group: "{{ noto_user }}"
+    mode: "0750"
+  loop:
+    - "{{ kuma_dir }}"
+    - "{{ kuma_dir }}/data"
+    - "{{ grafana_dir }}"
+    - "{{ grafana_dir }}/data"
+
+- name: Create compose files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dir }}/compose.yaml"
+    owner: "{{ noto_user }}"
+    group: "{{ noto_user }}"
+    mode: "0640"
+  loop:
+    - { src: kuma-compose.yaml.j2, dir: "{{ kuma_dir }}" }
+    - { src: grafana-compose.yaml.j2, dir: "{{ grafana_dir }}" }
+
+- name: Start compose stacks
+  community.docker.docker_compose_v2:
+    project_src: "{{ item }}"
+    state: present
+  loop:
+    - "{{ kuma_dir }}"
+    - "{{ grafana_dir }}"
